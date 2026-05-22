@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EOQ Lab TEI</title>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f6; /* Warna latar belakang dibuat sedikit lebih soft */
+    }
+
+    /* HEADER */
+    .header {
+      background-color: #0d6e6e;
+      color: white;
+      padding: 24px 32px;
+      border-bottom: 4px solid #f0a500;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px; /* Jarak antara teks dan logo dibuat lebih lega */
+    }
+
+    .header .badge {
+      background-color: #f0a500;
+      color: #0d1b2a;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 5px 12px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .header h1 {
+      margin: 4px 0;
+      font-size: 26px;
+      letter-spacing: 0.5px;
+    }
+
+    .header p {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .logo-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .logo-group img {
+      height: 70px;
+      width: 70px;
+      object-fit: contain;
+      background: white;
+      border-radius: 50%;
+      padding: 5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background-color: #0a5555;
+      display: flex;
+      gap: 4px;
+      padding: 0 32px;
+    }
+
+    .navbar button {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      padding: 16px 20px;
+      font-size: 14px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .navbar button:hover {
+      color: white;
+    }
+
+    .navbar button.active {
+      color: white;
+      border-bottom: 3px solid #f0a500;
+      font-weight: bold;
+    }
+
+    /* PAGES */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* BERANDA */
+    .beranda {
+      max-width: 760px;
+      margin: 50px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    .beranda h2 {
+      font-size: 28px;
+      color: #0d6e6e;
+      margin-bottom: 14px;
+    }
+
+    .beranda p {
+      font-size: 15px;
+      color: #4a5568;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .beranda .btn-mulai {
+      background-color: #0d6e6e;
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 48px;
+      transition: background 0.2s;
+      box-shadow: 0 4px 6px rgba(13, 110, 110, 0.2);
+    }
+
+    .beranda .btn-mulai:hover {
+      background-color: #0a5555;
+    }
+
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .step-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 20px;
+      width: 200px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      text-align: center;
+      border: 1px solid #e2e8f0;
+    }
+
+    .step-card .icon {
+      font-size: 30px; /* Ukuran ikon disesuaikan agar lebih proporsional */
+      color: #0d6e6e;  
+      margin-bottom: 12px;
+    }
+
+    .step-card h4 {
+      color: #0d6e6e;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .step-card p {
+      font-size: 12px;
+      color: #718096;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* KALKULATOR / FORM */
+    .form {
+      background: white;
+      margin: 40px auto;
+      padding: 32px;
+      max-width: 580px; /* Lebar form dibatasi agar tidak terlalu melar */
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+
+    .form h2 {
+      color: #0d6e6e;
+      margin-bottom: 24px;
+      font-size: 22px;
+    }
+
+    .form label {
+      font-size: 13px;
+      color: #2d3748;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .keterangan {
+      font-size: 11px;
+      color: #718096;
+      margin-bottom: 8px;
+      font-style: italic;
+      line-height: 1.4;
+    }
+
+    .form input {
+      width: 100%;
+      padding: 10px 12px; /* Input disesuaikan agar lebih ramping */
+      margin-bottom: 18px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #334155;
+      transition: border-color 0.2s;
+    }
+
+    .form input:focus {
+      outline: none;
+      border-color: #0d6e6e;
+    }
+
+    /* Mengubah warna teks cth / placeholder menjadi lebih gelap & jelas */
+    .form input::placeholder {
+      color: #94a3b8;
+    }
+
+    .form button {
+      background-color: #0d6e6e;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .form button:hover {
+      background-color: #0a5555;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      font-size: 14px;
+    }
+
+    table th {
+      background-color: #0d6e6e;
+      color: white;
+      padding: 12px 10px;
+      text-align: left;
+      border: 1px solid #0a5555;
+    }
+
+    table td {
+      padding: 12px 10px;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+    }
+
+    table tr:hover { background-color: #f8fafc; }
+
+    .btn-hapus {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-hapus:hover { background-color: #dc2626; }
+
+    #hasil h2 {
+      color: #0d6e6e;
+      margin-top: 32px;
+      font-size: 18px;
+    }
+
+    /* PANDUAN */
+    .panduan {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 20px 40px;
+    }
+
+    .panduan h2 {
+      color: #0d6e6e;
+      margin-bottom: 24px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .panduan-card {
+      background: white;
+      border-radius: 10px;
+      padding: 22px 26px;
+      margin-bottom: 20px; /* Jarak antar card panduan dibuat sedikit lebih lega */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      border-left: 4px solid #0d6e6e;
+      border-top: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .panduan-card h3 {
+      color: #0d6e6e;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .panduan-card p {
+      font-size: 13.5px;
+      color: #475569;
+      line-height: 1.7;
+    }
+
+    .panduan-card .contoh {
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #64748b;
+      border-left: 3px solid #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+  <div class="header-top">
+    <div>
+      <h1>Kalkulator EOQ Lab TEI</h1>
+      <p style="margin-bottom: 12px;">Economic Order Quantity — Alat Bantu Pengadaan Bahan Praktik</p>
+      <span class="badge">KKN — Magang Berdampak</span> </div>
+    <div class="logo-group">
+      <img src="Unipol_logo.jpeg" alt="Logo UNIPOL">
+      <img src="kampus berdampak_logo.jpeg" alt="Logo Kampus Berdampak">
+      <img src="smk1_logo.jpeg" alt="Logo SMK 1 Soppeng">
+    </div>
+  </div>
+</div>
+
+  <div class="navbar">
+    <button class="active" onclick="pindahHalaman('beranda', this)">
+      <i class="bi bi-house-door-fill"></i> Beranda
+    </button>
+    <button onclick="pindahHalaman('kalkulator', this)">
+      <i class="bi bi-calculator-fill"></i> Kalkulator
+    </button>
+    <button onclick="pindahHalaman('panduan', this)">
+      <i class="bi bi-journal-text"></i> Panduan
+    </button>
+  </div>
+
+  <div id="beranda" class="page active">
+    <div class="beranda">
+      <h2>Selamat Datang!</h2>
+      <p>Aplikasi ini membantu pengelola Lab TEI SMKN 1 Soppeng dalam menentukan jumlah pemesanan bahan praktik yang paling efisien menggunakan metode <strong>Economic Order Quantity (EOQ)</strong>.</p>
+      <button class="btn-mulai" onclick="pindahHalaman('kalkulator', document.querySelectorAll('.navbar button')[1])">Mulai Hitung EOQ</button>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i></div>
+          <h4>1. Isi Data</h4>
+          <p>Masukkan data komponen yang ingin dihitung</p>
+        </div>
+        <div class="step-card">
+          <div class="icon"><i class="bi bi-plus-circle-fill"></i></div>
+          <h4>2. Tambah</h4>
+          <p>Klik tombol Tambah Komponen</p>
+        </div>
+        <div class="step-card">
+          <div class="icon"><i class="bi bi-graph-up-arrow"></i></div>
+          <h4>3. Lihat Hasil</h4>
+          <p>Hasil EOQ langsung muncul di tabel</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="kalkulator" class="page">
+    <div class="form">
+      <h2>Input Data Komponen</h2>
+
+      <label>Nama Komponen</label>
+      <p class="keterangan">Nama bahan/komponen yang ingin dihitung kebutuhan pengadaannya.</p>
+      <input type="text" id="nama" placeholder="cth: Timah Solder">
+
+      <label>Demand per Tahun (D)</label>
+      <p class="keterangan">Perkiraan jumlah kebutuhan komponen dalam 1 tahun penuh. Estimasi berdasarkan pemakaian praktik.</p>
+      <input type="text" id="D" placeholder="cth: 24">
+
+      <label>Biaya Pesan per Order (S) — Rp</label>
+<p class="keterangan">Total biaya setiap kali pesan (ongkir, admin). Jika beberapa komponen dipesan sekaligus, biaya ini bisa dibagi rata.</p>
+<input type="text" id="S" placeholder="cth: 15000">
+
+<label>Harga Satuan (P) — Rp</label>
+<p class="keterangan">Harga 1 unit/pack/roll komponen di toko.</p>
+<input type="text" id="P" placeholder="cth: 25000">
+
+<label>Biaya Simpan (I) — % per tahun</label>
+<p class="keterangan">Persentase risiko kerusakan &amp; perawatan bahan per tahun. Gunakan angka 20 sebagai standar umum akuntansi persediaan.</p>
+<input type="text" id="I" placeholder="cth: 20">
+      <button onclick="tambahKomponen()">+ Tambah Komponen</button>
+      <button onclick="resetSemua()" style="background-color:#ef4444;color:white;border:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:bold;cursor:pointer;margin-left:10px;">🗑 Reset Semua</button>
+
+      <div id="hasil"></div>
+    </div>
+  </div>
+
+  <div id="panduan" class="page">
+    <div class="panduan">
+      <h2><i class="bi bi-book-half"></i> Panduan Penggunaan</h2>
+
+      <div class="panduan-card">
+        <h3>Apa itu EOQ?</h3>
+        <p>EOQ (Economic Order Quantity) adalah metode untuk menghitung jumlah pemesanan bahan yang paling hemat — tidak terlalu sedikit (sering pesan, ongkir mahal) dan tidak terlalu banyak (biaya simpan membengkak).</p>
+      </div>
+
+      <div class="panduan-card">
+        <h3>Nama Komponen</h3>
+        <p>Isi dengan nama bahan praktik yang ingin dihitung. Tidak ada batasan — bisa apa saja selama merupakan bahan yang habis pakai dan perlu restock.</p>
+        <div class="contoh">Contoh: Timah Solder, Kabel Jumper, Kabel Data USB</div>
+      </div>
+
+      <div class="panduan-card">
+        <h3>Demand per Tahun (D)</h3>
+        <p>Perkiraan jumlah kebutuhan komponen dalam 1 tahun. Estimasi berdasarkan pengalaman pemakaian praktik sebelumnya.</p>
+        <div class="contoh">Contoh: Timah solder habis sekitar 2 roll per bulan → isi 24</div>
+      </div>
+
+      <div class="panduan-card">
+        <h3>Biaya Pesan per Order (S)</h3>
+        <p>Biaya yang dikeluarkan setiap kali melakukan pemesanan ke toko/supplier, seperti ongkos kirim atau biaya administrasi.</p>
+        <div class="contoh">Contoh: Ongkir ke toko online Rp 15.000 → isi 15000</div>
+      </div>
+
+      <div class="panduan-card">
+        <h3>Harga Satuan (P)</h3>
+        <p>Harga 1 unit/pack/roll komponen di toko. Sesuaikan dengan harga terkini di pasaran.</p>
+        <div class="contoh">Contoh: 1 roll timah solder Rp 25.000 → isi 25000</div>
+      </div>
+
+      <div class="panduan-card">
+        <h3>Biaya Simpan (I)</h3>
+        <p>Persentase biaya penyimpanan per tahun dari harga satuan. Jika tidak diketahui, gunakan angka 20 sebagai standar umum.</p>
+        <div class="contoh">Contoh: Gunakan 20 jika tidak ada data khusus</div>
+      </div>
+
+      <div class="panduan-card" style="border-left-color:#f0a500;">
+        <h3>Membaca Hasil EOQ</h3>
+        <p><strong>EOQ (unit)</strong> → Jumlah yang disarankan untuk dibeli setiap kali order.<br>
+        <strong>Frekuensi/Tahun</strong> → Berapa kali dalam setahun harus melakukan pemesanan.<br>
+        <strong>Total Cost</strong> → Perkiraan total biaya pesan + simpan dalam setahun.</p>
+        <div class="contoh">Contoh: EOQ=12, Frekuensi=2x → beli 12 unit, 2 kali setahun</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let komponenList = [];
+
+  function pindahHalaman(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.navbar button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function tambahKomponen() {
+    const nama = document.getElementById('nama').value.trim();
+    const D = parseFloat(document.getElementById('D').value);
+    const S = parseFloat(document.getElementById('S').value);
+    const P = parseFloat(document.getElementById('P').value);
+    const I = parseFloat(document.getElementById('I').value);
+
+    if (!nama || isNaN(D) || isNaN(S) || isNaN(P) || isNaN(I)) {
+      alert('Mohon isi semua field terlebih dahulu.');
+      return;
+    }
+
+    const H = P * I / 100;
+    const EOQ = Math.sqrt((2 * D * S) / H);
+    const freq = D / EOQ;
+    const tp = (D / EOQ) * S;
+    const ts = (EOQ / 2) * H;
+    const tc = tp + ts;
+
+    komponenList.push({ nama, D, S, P, I, H, EOQ, freq, tp, ts, tc });
+
+    tampilkanHasil();
+    resetForm();
+  }
+
+  function hapusBaris(i) {
+    komponenList.splice(i, 1);
+    tampilkanHasil();
+  }
+
+  function resetForm() {
+    document.getElementById('nama').value = '';
+    document.getElementById('D').value = '';
+    document.getElementById('S').value = '';
+    document.getElementById('P').value = '';
+    document.getElementById('I').value = '';
+  }
+
+  function tampilkanHasil() {
+    if (komponenList.length === 0) {
+      document.getElementById('hasil').innerHTML = '';
+      return;
+    }
+
+    let html = '<h2>Hasil Perhitungan EOQ</h2>';
+    html += '<table>';
+    html += '<tr><th>No</th><th>Komponen</th><th>EOQ (unit)</th><th>Frekuensi/Tahun</th><th>Biaya Operasional (Rp)</th><th>Aksi</th></tr>';
+    komponenList.forEach((k, i) => {
+      html += `<tr>
+        <td>${i+1}</td>
+        <td>${k.nama}</td>
+        <td>${Math.round(k.EOQ)}</td>
+        <td>${k.freq.toFixed(1)}x</td>
+        <td>Rp ${Math.round(k.tc).toLocaleString('id-ID')}</td>
+        <td><button class="btn-hapus" onclick="hapusBaris(${i})">Hapus</button></td>
+      </tr>`;
+    });
+
+    html += '</table>';
+    document.getElementById('hasil').innerHTML = html;
+  }
+
+  function resetSemua() {
+    komponenList = [];
+    document.getElementById('hasil').innerHTML = '';
+    resetForm();
+  }
+</script>
+<hr style="border: 0; border-top: 1px solid #e2e8f0; margin-top: 30px; margin-bottom: 20px;">
+<div style="text-align: center; color: #94a3b8; font-size: 11px; font-weight: 500; font-family: sans-serif; padding-bottom: 20px;">
+    © Sistem Kalkulator EOQ - Magang Berdampak UNIPOL 2026
+</div>
+</body>
+</html>
