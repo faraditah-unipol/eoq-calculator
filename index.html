@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EOQ Lab TEI</title>
-  
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+  <title>Sistem Optimasi Pengadaan Lab TEI</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f7f6; /* Warna latar belakang dibuat sedikit lebih soft */
+      background-color: #f0f4f8;
     }
 
-    /* HEADER */
     .header {
       background-color: #0d6e6e;
       color: white;
-      padding: 24px 32px;
+      padding: 20px 32px;
       border-bottom: 4px solid #f0a500;
     }
 
@@ -28,51 +26,25 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 20px; /* Jarak antara teks dan logo dibuat lebih lega */
+      gap: 10px;
     }
 
-    .header .badge {
-      background-color: #f0a500;
-      color: #0d1b2a;
-      font-size: 12px;
-      font-weight: bold;
-      padding: 5px 12px;
-      border-radius: 4px;
-      display: inline-block;
-      margin-bottom: 8px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
+    .header h1 { margin: 4px 0; font-size: 24px; }
+    .header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
 
-    .header h1 {
-      margin: 4px 0;
-      font-size: 26px;
-      letter-spacing: 0.5px;
-    }
-
-    .header p {
-      font-size: 13px;
-      opacity: 0.85;
-      margin-top: 4px;
-    }
-
-    .logo-group {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
+    .logo-group { display: flex; gap: 12px; align-items: center; }
+    
+    /* Perbaikan frame logo mengikuti gambar agar bulat sempurna tanpa background hitam mengganggu */
     .logo-group img {
-      height: 70px;
-      width: 70px;
-      object-fit: contain;
+      height: 75px; 
+      width: 75px;
+      object-fit: cover;
       background: white;
       border-radius: 50%;
-      padding: 5px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      padding: 2px;
+      border: 2px solid #fff;
     }
 
-    /* NAVBAR */
     .navbar {
       background-color: #0a5555;
       display: flex;
@@ -84,158 +56,120 @@
       background: none;
       border: none;
       color: rgba(255,255,255,0.7);
-      padding: 16px 20px;
+      padding: 14px 20px;
       font-size: 14px;
       cursor: pointer;
       border-bottom: 3px solid transparent;
       transition: all 0.2s;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .navbar button:hover {
-      color: white;
-    }
-
+    .navbar button:hover { color: white; }
     .navbar button.active {
       color: white;
       border-bottom: 3px solid #f0a500;
       font-weight: bold;
     }
 
-    /* PAGES */
     .page { display: none; }
     .page.active { display: block; }
 
     /* BERANDA */
     .beranda {
-      max-width: 760px;
-      margin: 50px auto;
+      max-width: 750px;
+      margin: 40px auto;
       padding: 0 20px;
       text-align: center;
     }
 
-    .beranda h2 {
-      font-size: 28px;
-      color: #0d6e6e;
-      margin-bottom: 14px;
-    }
-
-    .beranda p {
-      font-size: 15px;
-      color: #4a5568;
-      line-height: 1.7;
-      margin-bottom: 28px;
-    }
+    .beranda h2 { font-size: 26px; color: #0d6e6e; margin-bottom: 12px; }
+    .beranda p { font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 24px; }
 
     .beranda .btn-mulai {
       background-color: #0d6e6e;
       color: white;
       border: none;
-      padding: 14px 36px;
+      padding: 14px 32px;
       border-radius: 8px;
       font-size: 16px;
-      font-weight: bold;
       cursor: pointer;
-      margin-bottom: 48px;
-      transition: background 0.2s;
-      box-shadow: 0 4px 6px rgba(13, 110, 110, 0.2);
+      margin-bottom: 40px;
     }
 
-    .beranda .btn-mulai:hover {
-      background-color: #0a5555;
-    }
+    .beranda .btn-mulai:hover { background-color: #0a5555; }
 
     .steps {
       display: flex;
       justify-content: center;
-      gap: 24px;
+      gap: 20px;
       flex-wrap: wrap;
       margin-top: 10px;
     }
 
     .step-card {
       background: white;
-      border-radius: 12px;
-      padding: 24px 20px;
-      width: 200px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-radius: 10px;
+      padding: 20px;
+      width: 210px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       text-align: center;
-      border: 1px solid #e2e8f0;
     }
 
     .step-card .icon {
-      font-size: 30px; /* Ukuran ikon disesuaikan agar lebih proporsional */
-      color: #0d6e6e;  
-      margin-bottom: 12px;
-    }
-
-    .step-card h4 {
-      color: #0d6e6e;
+      font-size: 28px;
       margin-bottom: 8px;
-      font-size: 15px;
-    }
-
-    .step-card p {
-      font-size: 12px;
-      color: #718096;
-      line-height: 1.5;
-      margin: 0;
-    }
-
-    /* KALKULATOR / FORM */
-    .form {
-      background: white;
-      margin: 40px auto;
-      padding: 32px;
-      max-width: 580px; /* Lebar form dibatasi agar tidak terlalu melar */
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      border: 1px solid #e2e8f0;
-    }
-
-    .form h2 {
       color: #0d6e6e;
-      margin-bottom: 24px;
-      font-size: 22px;
     }
+
+    .step-card h4 { color: #0d6e6e; margin-bottom: 6px; font-size: 14px; }
+    .step-card p { font-size: 12px; color: #777; margin: 0; line-height: 1.4; }
+
+    /* KALKULATOR & RIWAYAT */
+    .form, .card-riwayat {
+      background: white;
+      margin: 32px auto;
+      padding: 28px;
+      max-width: 700px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .form h2, .card-riwayat h2 { color: #0d6e6e; margin-bottom: 20px; }
 
     .form label {
       font-size: 13px;
-      color: #2d3748;
+      color: #333;
       font-weight: bold;
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .keterangan {
       font-size: 11px;
-      color: #718096;
-      margin-bottom: 8px;
+      color: #888;
+      margin-bottom: 6px;
       font-style: italic;
-      line-height: 1.4;
     }
 
-    .form input {
+    .form input, .form select {
       width: 100%;
-      padding: 10px 12px; /* Input disesuaikan agar lebih ramping */
-      margin-bottom: 18px;
-      border: 1px solid #cbd5e1;
+      padding: 10px;
+      margin-bottom: 14px;
+      border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 14px;
-      color: #334155;
-      transition: border-color 0.2s;
+      background-color: white;
     }
 
-    .form input:focus {
-      outline: none;
-      border-color: #0d6e6e;
-    }
-
-    /* Mengubah warna teks cth / placeholder menjadi lebih gelap & jelas */
-    .form input::placeholder {
-      color: #94a3b8;
+    .rupiah-preview {
+      font-size: 12px;
+      color: #2e7d32;
+      font-weight: bold;
+      margin-top: -10px;
+      margin-bottom: 14px;
+      display: block;
     }
 
     .form button {
@@ -244,250 +178,406 @@
       border: none;
       padding: 12px 24px;
       border-radius: 6px;
-      font-size: 14px;
-      font-weight: bold;
+      font-size: 15px;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
-    .form button:hover {
-      background-color: #0a5555;
-    }
+    .form button:hover { background-color: #0a5555; }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 24px;
+      margin-top: 16px;
       font-size: 14px;
     }
 
     table th {
       background-color: #0d6e6e;
       color: white;
-      padding: 12px 10px;
+      padding: 10px;
       text-align: left;
       border: 1px solid #0a5555;
     }
 
-    table td {
-      padding: 12px 10px;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-    }
-
-    table tr:hover { background-color: #f8fafc; }
+    table td { padding: 10px; border: 1px solid #ddd; }
+    table tr:hover { background-color: #f9f9f9; }
 
     .btn-hapus {
-      background-color: #ef4444;
+      background-color: #e05555;
       color: white;
       border: none;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 4px;
       font-size: 12px;
-      font-weight: bold;
       cursor: pointer;
     }
 
-    .btn-hapus:hover { background-color: #dc2626; }
+    .btn-hapus:hover { background-color: #c03333; }
 
-    #hasil h2 {
-      color: #0d6e6e;
-      margin-top: 32px;
-      font-size: 18px;
+    .btn-muat {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-right: 4px;
     }
+    .btn-muat:hover { background-color: #1b5e20; }
+
+    #hasil h2 { color: #0d6e6e; margin-top: 24px; }
+
+    /* RINGKASAN */
+    .ringkasan {
+      background: #f0f9f8;
+      border: 1px solid #0d6e6e;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-top: 20px;
+    }
+
+    .ringkasan h3 {
+      color: #0d6e6e;
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .ringkasan ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ringkasan ul li {
+      font-size: 13px;
+      color: #333;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .ringkasan ul li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: #0d6e6e;
+      font-weight: bold;
+    }
+
+    /* GRAFIK */
+    .grafik-wrap {
+      margin-top: 24px;
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid #ddd;
+    }
+
+    .grafik-wrap h3 {
+      color: #0d6e6e;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    /* TOMBOL AKSI ATAS */
+    .action-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-print {
+      background-color: #0d6e6e;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-print:hover { background-color: #0a5555; }
+
+    .btn-simpan-riwayat {
+      background-color: #f0a500;
+      color: #0d1b2a;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-simpan-riwayat:hover { background-color: #d69200; }
 
     /* PANDUAN */
     .panduan {
-      max-width: 700px;
-      margin: 40px auto;
+      max-width: 680px;
+      margin: 32px auto;
       padding: 0 20px 40px;
     }
 
-    .panduan h2 {
-      color: #0d6e6e;
-      margin-bottom: 24px;
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .panduan h2 { color: #0d6e6e; margin-bottom: 20px; font-size: 22px; }
 
     .panduan-card {
       background: white;
       border-radius: 10px;
-      padding: 22px 26px;
-      margin-bottom: 20px; /* Jarak antar card panduan dibuat sedikit lebih lega */
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
       border-left: 4px solid #0d6e6e;
-      border-top: 1px solid #f1f5f9;
-      border-right: 1px solid #f1f5f9;
-      border-bottom: 1px solid #f1f5f9;
     }
 
-    .panduan-card h3 {
-      color: #0d6e6e;
-      margin-bottom: 8px;
-      font-size: 16px;
-    }
-
-    .panduan-card p {
-      font-size: 13.5px;
-      color: #475569;
-      line-height: 1.7;
-    }
+    .panduan-card h3 { color: #0d6e6e; margin-bottom: 8px; font-size: 15px; }
+    .panduan-card p { font-size: 13px; color: #555; line-height: 1.7; }
 
     .panduan-card .contoh {
-      background: #f8fafc;
+      background: #f0f4f8;
       border-radius: 6px;
       padding: 10px 14px;
-      margin-top: 12px;
+      margin-top: 10px;
       font-size: 13px;
-      color: #64748b;
-      border-left: 3px solid #cbd5e1;
+      color: #333;
     }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #888;
+      border-top: 1px solid #ddd;
+      margin-top: 40px;
+    }
+
+    /* CSS MEDIA PRINT UNTUK CETAK LEMBAR NEGARA RESMI */
+    @media print {
+      body { background-color: white; }
+      
+      /* Menyembunyikan seluruh elemen input, tombol, navbar, dan JUDUL FORM INPUT */
+      .navbar, .form > label, .form > input, .form > select,
+      .form > p, .form > button, .keterangan, .rupiah-preview,
+      .action-group, .btn-hapus, .card-riwayat,
+      .form h2 { display: none !important; } /* <-- Menambahkan .form h2 agar teks input hilang */
+      
+      /* Memastikan penampang utama, hasil, ringkasan, dan grafik tetap tegak dan rapi */
+      .header, #hasil, .ringkasan, .grafik-wrap { display: block !important; }
+      .form { box-shadow: none; margin: 0; padding: 0; max-width: 100%; border: none; }
+      
+      /* Memberi batas jarak atas yang rapi untuk Lembar Usulan */
+      #hasil {
+        margin-top: 30px !important;
+      }
+
+      /* Membuat Header Laporan Cetak Resmi */
+      #hasil::before {
+        content: "LEMBAR USULAN PENGADAAN BAHAN PRAKTIK HABIS PAKAI LAB TEI";
+        display: block;
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 25px;
+        color: #000;
+        border-bottom: 2px solid #000;
+        padding-bottom: 8px;
+      }
+    }
+    
   </style>
 </head>
 <body>
 
   <div class="header">
-  <div class="header-top">
-    <div>
-      <h1>Kalkulator EOQ Lab TEI</h1>
-      <p style="margin-bottom: 12px;">Economic Order Quantity — Alat Bantu Pengadaan Bahan Praktik</p>
-      <span class="badge">KKN — Magang Berdampak</span> </div>
-    <div class="logo-group">
-      <img src="Unipol_logo.jpeg" alt="Logo UNIPOL">
-      <img src="kampus berdampak_logo.jpeg" alt="Logo Kampus Berdampak">
-      <img src="smk_logo.jpeg" alt="Logo SMK 1 Soppeng">
+    <div class="header-top">
+      <div>
+        <h1>Sistem Optimasi Pengadaan Lab TEI</h1>
+        <p>Economic Order Quantity — Alat Bantu Pengadaan Bahan Praktik</p>
+      </div>
+      <div class="logo-group">
+        <img src="Unipol_logo.jpeg" alt="Logo UNIPOL">
+        <img src="kampus berdampak_logo.jpeg" alt="Logo Kampus Berdampak">
+        <img src="smk_logo.jpeg" alt="Logo SMK 1 Soppeng">
+      </div>
     </div>
   </div>
-</div>
 
   <div class="navbar">
-    <button class="active" onclick="pindahHalaman('beranda', this)">
-      <i class="bi bi-house-door-fill"></i> Beranda
-    </button>
-    <button onclick="pindahHalaman('kalkulator', this)">
-      <i class="bi bi-calculator-fill"></i> Kalkulator
-    </button>
-    <button onclick="pindahHalaman('panduan', this)">
-      <i class="bi bi-journal-text"></i> Panduan
-    </button>
+    <button class="active" onclick="pindahHalaman('beranda', this)"><i class="fa fa-house"></i> Beranda</button>
+    <button onclick="pindahHalaman('kalkulator', this)"><i class="fa fa-calculator"></i> Kalkulator</button>
+    <button onclick="pindahHalaman('panduan', this)"><i class="fa fa-book"></i> Panduan</button>
   </div>
 
+  <!-- BERANDA -->
   <div id="beranda" class="page active">
     <div class="beranda">
-      <h2>Selamat Datang!</h2>
-      <p>Aplikasi ini membantu pengelola Lab TEI SMKN 1 Soppeng dalam menentukan jumlah pemesanan bahan praktik yang paling efisien menggunakan metode <strong>Economic Order Quantity (EOQ)</strong>.</p>
-      <button class="btn-mulai" onclick="pindahHalaman('kalkulator', document.querySelectorAll('.navbar button')[1])">Mulai Hitung EOQ</button>
-
+      <h2>Sistem Analisis & Pengadaan Bahan Praktik</h2>
+      <p>Gunakan sistem ini untuk menghitung volume pesanan optimal (EOQ) komponen habis pakai guna efisiensi anggaran operasional Lab TEI SMKN 1 Soppeng.</p>
+      <button class="btn-mulai" onclick="pindahHalaman('kalkulator', document.querySelectorAll('.navbar button')[1])">Mulai Hitung EOQ <i class="fa fa-arrow-right"></i></button>
       <div class="steps">
         <div class="step-card">
-          <div class="icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i></div>
-          <h4>1. Isi Data</h4>
-          <p>Masukkan data komponen yang ingin dihitung</p>
+          <div class="icon"><i class="fa fa-list-check"></i></div>
+          <h4>1. Entri Komponen</h4>
+          <p>Pilih komponen habis pakai dan masukkan estimasi kebutuhan praktik harian/tahunan.</p>
         </div>
         <div class="step-card">
-          <div class="icon"><i class="bi bi-plus-circle-fill"></i></div>
-          <h4>2. Tambah</h4>
-          <p>Klik tombol Tambah Komponen</p>
+          <div class="icon"><i class="fa fa-calculator"></i></div>
+          <h4>2. Hitung Optimalisasi</h4>
+          <p>Sistem otomatis menghitung volume pesanan paling ekonomis (EOQ) secara real-time.</p>
         </div>
         <div class="step-card">
-          <div class="icon"><i class="bi bi-graph-up-arrow"></i></div>
-          <h4>3. Lihat Hasil</h4>
-          <p>Hasil EOQ langsung muncul di tabel</p>
+          <div class="icon"><i class="fa fa-print"></i></div>
+          <h4>3. Cetak Usulan</h4>
+          <p>Tinjau grafik analisis biaya lalu cetak lembar usulan pengadaan resmi untuk diverifikasi.</p>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- KALKULATOR -->
   <div id="kalkulator" class="page">
     <div class="form">
-      <h2>Input Data Komponen</h2>
+      <h2><i class="fa fa-calculator"></i> Input Data Komponen</h2>
 
       <label>Nama Komponen</label>
-      <p class="keterangan">Nama bahan/komponen yang ingin dihitung kebutuhan pengadaannya.</p>
-      <input type="text" id="nama" placeholder="cth: Timah Solder">
+      <p class="keterangan">Pilih dari komponen habis pakai standar TEI atau pilih 'Lainnya' untuk mengetik manual.</p>
+      <!-- Integrasi Datalist untuk Dropdown Pintar Komponen TEI -->
+      <input type="text" id="nama" list="komponen-tei" placeholder="Pilih atau ketik nama komponen...">
+      <datalist id="komponen-tei">
+        <option value="Timah Solder (Roll)">
+        <option value="Kabel Jumper Pack (Male-Male)">
+        <option value="Kabel Jumper Pack (Male-Female)">
+        <option value="Papan PCB Polos (Pcs)">
+        <option value="Kabel Data Micro / Type-C">
+        <option value="Mata Solder Kristal">
+        <option value="Attractor / Penyedot Timah">
+        <option value="Resistor Kit (Aneka Ohm)">
+        <option value="Mata Pisau Cutter (Pack)">
+        <option value="Modul IoT (ESP32 / ESP8266)">
+        <option value="Cairan Ferit Klorida (Pelarut PCB)">
+      </datalist>
 
       <label>Demand per Tahun (D)</label>
       <p class="keterangan">Perkiraan jumlah kebutuhan komponen dalam 1 tahun penuh. Estimasi berdasarkan pemakaian praktik.</p>
-      <input type="text" id="D" placeholder="cth: 24">
+      <input type="number" id="D" placeholder="cth: 24">
 
       <label>Biaya Pesan per Order (S) — Rp</label>
-<p class="keterangan">Total biaya setiap kali pesan (ongkir, admin). Jika beberapa komponen dipesan sekaligus, biaya ini bisa dibagi rata.</p>
-<input type="text" id="S" placeholder="cth: 15000">
+      <p class="keterangan">Total biaya setiap kali pesan (ongkir, admin). Angka murni tanpa titik.</p>
+      <input type="number" id="S" placeholder="cth: 15000" onkeyup="liveRupiah(this, 'previewS')">
+      <span id="previewS" class="rupiah-preview"></span>
 
-<label>Harga Satuan (P) — Rp</label>
-<p class="keterangan">Harga 1 unit/pack/roll komponen di toko.</p>
-<input type="text" id="P" placeholder="cth: 25000">
+      <label>Harga Satuan (P) — Rp</label>
+      <p class="keterangan">Harga 1 unit/pack/roll komponen di toko. Angka murni tanpa titik.</p>
+      <input type="number" id="P" placeholder="cth: 25000" onkeyup="liveRupiah(this, 'previewP')">
+      <span id="previewP" class="rupiah-preview"></span>
 
-<label>Biaya Simpan (I) — % per tahun</label>
-<p class="keterangan">Persentase risiko kerusakan &amp; perawatan bahan per tahun. Gunakan angka 20 sebagai standar umum akuntansi persediaan.</p>
-<input type="text" id="I" placeholder="cth: 20">
-      <button onclick="tambahKomponen()">+ Tambah Komponen</button>
-      <button onclick="resetSemua()" style="background-color:#ef4444;color:white;border:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:bold;cursor:pointer;margin-left:10px;">🗑 Reset Semua</button>
+      <label>Biaya Simpan (I) — % per tahun</label>
+      <p class="keterangan">Persentase risiko kerusakan & perawatan bahan per tahun. Gunakan angka 20 sebagai standar umum akuntansi persediaan.</p>
+      <input type="number" id="I" value="20" placeholder="cth: 20">
+
+      <button onclick="tambahKomponen()"><i class="fa fa-plus"></i> Tambah Komponen</button>
+      <button onclick="resetSemua()" style="background-color:#e05555;color:white;border:none;padding:12px 24px;border-radius:6px;font-size:15px;cursor:pointer;margin-left:10px;"><i class="fa fa-eraser"></i> Bersihkan Input</button>
 
       <div id="hasil"></div>
+      <div id="ringkasan"></div>
+      
+      <div id="grafik-wrap" style="display:none;" class="grafik-wrap">
+        <h3><i class="fa fa-chart-bar"></i> Grafik Perbandingan EOQ</h3>
+        <canvas id="grafikEOQ"></canvas>
+      </div>
+      
+      <div id="print-wrap" class="action-group" style="display:none;">
+        <button class="btn-print" onclick="window.print()"><i class="fa fa-print"></i> Cetak Hasil Laporan</button>
+        <!-- Fitur Simpan Manual Masuk ke Riwayat Storage -->
+        <button class="btn-simpan-riwayat" onclick="simpanKeRiwayat()"><i class="fa fa-bookmark"></i> Simpan ke Riwayat Arsip</button>
+      </div>
+    </div>
+
+    <!-- CARD TABEL RIWAYAT TERSTURKTUR -->
+    <div class="card-riwayat">
+      <h2><i class="fa fa-history"></i> Riwayat Analisis Pengadaan</h2>
+      <p class="keterangan" style="margin-bottom: 12px;">Daftar kumpulan bundel kalkulasi pengadaan resmi yang sengaja Anda simpan.</p>
+      <div id="tabel-riwayat-place"></div>
     </div>
   </div>
 
+  <!-- PANDUAN -->
   <div id="panduan" class="page">
     <div class="panduan">
-      <h2><i class="bi bi-book-half"></i> Panduan Penggunaan</h2>
-
+      <h2><i class="fa fa-book"></i> Panduan Penggunaan</h2>
       <div class="panduan-card">
         <h3>Apa itu EOQ?</h3>
         <p>EOQ (Economic Order Quantity) adalah metode untuk menghitung jumlah pemesanan bahan yang paling hemat — tidak terlalu sedikit (sering pesan, ongkir mahal) dan tidak terlalu banyak (biaya simpan membengkak).</p>
       </div>
-
       <div class="panduan-card">
         <h3>Nama Komponen</h3>
         <p>Isi dengan nama bahan praktik yang ingin dihitung. Tidak ada batasan — bisa apa saja selama merupakan bahan yang habis pakai dan perlu restock.</p>
         <div class="contoh">Contoh: Timah Solder, Kabel Jumper, Kabel Data USB</div>
       </div>
-
       <div class="panduan-card">
         <h3>Demand per Tahun (D)</h3>
         <p>Perkiraan jumlah kebutuhan komponen dalam 1 tahun. Estimasi berdasarkan pengalaman pemakaian praktik sebelumnya.</p>
         <div class="contoh">Contoh: Timah solder habis sekitar 2 roll per bulan → isi 24</div>
       </div>
-
       <div class="panduan-card">
         <h3>Biaya Pesan per Order (S)</h3>
         <p>Biaya yang dikeluarkan setiap kali melakukan pemesanan ke toko/supplier, seperti ongkos kirim atau biaya administrasi.</p>
         <div class="contoh">Contoh: Ongkir ke toko online Rp 15.000 → isi 15000</div>
       </div>
-
       <div class="panduan-card">
         <h3>Harga Satuan (P)</h3>
         <p>Harga 1 unit/pack/roll komponen di toko. Sesuaikan dengan harga terkini di pasaran.</p>
         <div class="contoh">Contoh: 1 roll timah solder Rp 25.000 → isi 25000</div>
       </div>
-
       <div class="panduan-card">
         <h3>Biaya Simpan (I)</h3>
         <p>Persentase biaya penyimpanan per tahun dari harga satuan. Jika tidak diketahui, gunakan angka 20 sebagai standar umum.</p>
         <div class="contoh">Contoh: Gunakan 20 jika tidak ada data khusus</div>
       </div>
-
-      <div class="panduan-card" style="border-left-color:#f0a500;">
-        <h3>Membaca Hasil EOQ</h3>
-        <p><strong>EOQ (unit)</strong> → Jumlah yang disarankan untuk dibeli setiap kali order.<br>
-        <strong>Frekuensi/Tahun</strong> → Berapa kali dalam setahun harus melakukan pemesanan.<br>
-        <strong>Total Cost</strong> → Perkiraan total biaya pesan + simpan dalam setahun.</p>
-        <div class="contoh">Contoh: EOQ=12, Frekuensi=2x → beli 12 unit, 2 kali setahun</div>
-      </div>
     </div>
   </div>
 
+  <!-- Watermark Fix sesuai Opsi Kesepakatan Akhir -->
+  <div class="footer">© Sistem Optimasi Pengadaan Lab TEI — Magang Berdampak Unipol 2026</div>
+
 <script>
   let komponenList = [];
+  let riwayatList = [];
+  let grafikInstance = null;
+
+  // Fungsi saat window pertama kali dimuat (Load LocalStorage agar data tidak hilang)
+  window.onload = function() {
+    if (localStorage.getItem('tei_komponen_list')) {
+      komponenList = JSON.parse(localStorage.getItem('tei_komponen_list'));
+      tampilkanHasil();
+    }
+    if (localStorage.getItem('tei_riwayat_list')) {
+      riwayatList = JSON.parse(localStorage.getItem('tei_riwayat_list'));
+    }
+    tampilkanTabelRiwayat();
+  };
 
   function pindahHalaman(id, btn) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.navbar button').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     btn.classList.add('active');
+  }
+
+  // Real-time Text Pembantu Format Mata Uang Rupiah
+  function liveRupiah(input, previewId) {
+    const value = parseFloat(input.value);
+    const previewSpan = document.getElementById(previewId);
+    if (!isNaN(value) && value > 0) {
+      previewSpan.innerText = "Format Terbaca: Rp " + value.toLocaleString('id-ID');
+    } else {
+      previewSpan.innerText = "";
+    }
   }
 
   function tambahKomponen() {
@@ -498,18 +588,22 @@
     const I = parseFloat(document.getElementById('I').value);
 
     if (!nama || isNaN(D) || isNaN(S) || isNaN(P) || isNaN(I)) {
-      alert('Mohon isi semua field terlebih dahulu.');
+      alert('Mohon isi semua field terlebih dahulu dengan angka valid.');
       return;
     }
 
     const H = P * I / 100;
     const EOQ = Math.sqrt((2 * D * S) / H);
     const freq = D / EOQ;
+    const interval = Math.round(12 / freq);
     const tp = (D / EOQ) * S;
     const ts = (EOQ / 2) * H;
     const tc = tp + ts;
 
-    komponenList.push({ nama, D, S, P, I, H, EOQ, freq, tp, ts, tc });
+    komponenList.push({ nama, D, S, P, I, H, EOQ, freq, interval, tp, ts, tc });
+    
+    // Simpan ke LocalStorage komponen aktif saat ini
+    localStorage.setItem('tei_komponen_list', JSON.stringify(komponenList));
 
     tampilkanHasil();
     resetForm();
@@ -517,50 +611,178 @@
 
   function hapusBaris(i) {
     komponenList.splice(i, 1);
+    localStorage.setItem('tei_komponen_list', JSON.stringify(komponenList));
     tampilkanHasil();
   }
 
   function resetForm() {
-    document.getElementById('nama').value = '';
-    document.getElementById('D').value = '';
-    document.getElementById('S').value = '';
-    document.getElementById('P').value = '';
-    document.getElementById('I').value = '';
+    ['nama','D','S','P','I'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('I').value = "20"; // reset default value
+    document.getElementById('previewS').innerText = "";
+    document.getElementById('previewP').innerText = "";
   }
 
   function tampilkanHasil() {
     if (komponenList.length === 0) {
       document.getElementById('hasil').innerHTML = '';
+      document.getElementById('ringkasan').innerHTML = '';
+      document.getElementById('grafik-wrap').style.display = 'none';
+      document.getElementById('print-wrap').style.display = 'none';
       return;
     }
 
-    let html = '<h2>Hasil Perhitungan EOQ</h2>';
-    html += '<table>';
-    html += '<tr><th>No</th><th>Komponen</th><th>EOQ (unit)</th><th>Frekuensi/Tahun</th><th>Biaya Operasional (Rp)</th><th>Aksi</th></tr>';
+    let html = '<h2>Hasil Perhitungan EOQ</h2><table>';
+    html += '<tr><th>No</th><th>Komponen</th><th>EOQ (unit)</th><th>Interval Pesan</th><th>Biaya Operasional (Rp)</th><th>Aksi</th></tr>';
+
     komponenList.forEach((k, i) => {
       html += `<tr>
         <td>${i+1}</td>
         <td>${k.nama}</td>
         <td>${Math.round(k.EOQ)}</td>
-        <td>${k.freq.toFixed(1)}x</td>
+        <td>Setiap ${k.interval} bulan sekali</td>
         <td>Rp ${Math.round(k.tc).toLocaleString('id-ID')}</td>
-        <td><button class="btn-hapus" onclick="hapusBaris(${i})">Hapus</button></td>
+        <td><button class="btn-hapus" onclick="hapusBaris(${i})"><i class="fa fa-trash"></i></button></td>
       </tr>`;
     });
 
     html += '</table>';
     document.getElementById('hasil').innerHTML = html;
+
+    const totalBiaya = komponenList.reduce((a, k) => a + k.tc, 0);
+    const seringDipesan = komponenList.reduce((a, b) => a.freq > b.freq ? a : b);
+    const termahal = komponenList.reduce((a, b) => a.tc > b.tc ? a : b);
+
+    document.getElementById('ringkasan').innerHTML = `
+      <div class="ringkasan">
+        <h3><i class="fa fa-list-check"></i> Ringkasan</h3>
+        <ul>
+          <li>Total biaya operasional seluruh komponen: <strong>Rp ${Math.round(totalBiaya).toLocaleString('id-ID')}/tahun</strong></li>
+          <li>Komponen paling sering dipesan: <strong>${seringDipesan.nama}</strong> (setiap ${seringDipesan.interval} bulan)</li>
+          <li>Komponen dengan biaya operasional terbesar: <strong>${termahal.nama}</strong> (Rp ${Math.round(termahal.tc).toLocaleString('id-ID')})</li>
+        </ul>
+      </div>`;
+
+    document.getElementById('grafik-wrap').style.display = 'block';
+    document.getElementById('print-wrap').style.display = 'flex';
+
+    if (grafikInstance) grafikInstance.destroy();
+
+    const ctx = document.getElementById('grafikEOQ').getContext('2d');
+    grafikInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: komponenList.map(k => k.nama),
+        datasets: [{
+          label: 'EOQ (unit)',
+          data: komponenList.map(k => Math.round(k.EOQ)),
+          backgroundColor: '#0d6e6e',
+          borderRadius: 6,
+          barPercentage: 0.6,
+          categoryPercentage: 0.6,
+          maxBarThickness: 60,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
   }
 
+  // Sekarang fungsinya murni HANYA mengosongkan kolom ketikan input saja
   function resetSemua() {
-    komponenList = [];
-    document.getElementById('hasil').innerHTML = '';
-    resetForm();
+    resetForm(); 
+  }
+
+  /* ================= SIMPAN & MUAT SISTEM RIWAYAT MANUAL ================= */
+  function simpanKeRiwayat() {
+    if (komponenList.length === 0) {
+      alert("Tidak ada data komponen aktif untuk dimasukkan ke riwayat.");
+      return;
+    }
+
+    const waktuSekarang = new Date();
+    const stringWaktu = waktuSekarang.toLocaleDateString('id-ID', {
+      day: '2-digit', month: 'long', year: 'numeric'
+    }) + " - " + waktuSekarang.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+    const totalBiaya = komponenList.reduce((a, k) => a + k.tc, 0);
+
+    // Kloning array komponen aktif saat ini agar tidak putus relasi memorinya
+    const bundelData = JSON.parse(JSON.stringify(komponenList));
+
+    riwayatList.push({
+      id: Date.now(),
+      waktu: stringWaktu,
+      totalItem: komponenList.length,
+      totalBiaya: totalBiaya,
+      data: bundelData
+    });
+
+    localStorage.setItem('tei_riwayat_list', JSON.stringify(riwayatList));
+    tampilkanTabelRiwayat();
+    alert("Berhasil mengarsipkan perhitungan ini ke dalam tabel riwayat di bawah!");
+  }
+
+  function tampilkanTabelRiwayat() {
+    const tempatTabel = document.getElementById('tabel-riwayat-place');
+    
+    if (riwayatList.length === 0) {
+      tempatTabel.innerHTML = "<p class='keterangan' style='text-align:center; padding: 20px; border: 1px dashed #ccc;'>Belum ada riwayat pengadaan resmi yang disimpan.</p>";
+      return;
+    }
+
+    let html = "<table><tr><th>No</th><th>Tanggal & Jam</th><th>Total Item</th><th>Estimasi Biaya</th><th>Aksi</th></tr>";
+    
+    riwayatList.forEach((r, idx) => {
+      html += `<tr>
+        <td>${idx + 1}</td>
+        <td>${r.waktu}</td>
+        <td>${r.totalItem} Komponen</td>
+        <td>Rp ${Math.round(r.totalBiaya).toLocaleString('id-ID')}</td>
+        <td>
+          <button class="btn-muat" onclick="muatRiwayat(${r.id})"><i class="fa fa-folder-open"></i> Muat</button>
+          <button class="btn-hapus" onclick="hapusRiwayat(${r.id})"><i class="fa fa-times"></i></button>
+        </td>
+      </tr>`;
+    });
+
+    html += "</table>";
+    html += `<div style='text-align:center; margin-top:14px;'>
+              <button onclick='bersihkanSemuaRiwayat()' style='background-color:#555; color:white; border:none; padding:8px 16px; border-radius:4px; font-size:12px; cursor:pointer;'><i class='fa fa-dumpster'></i> Kosongkan Semua Riwayat Arsip</button>
+             </div>`;
+    tempatTabel.innerHTML = html;
+  }
+
+  function muatRiwayat(idRiwayat) {
+    const target = riwayatList.find(r => r.id === idRiwayat);
+    if (target) {
+      if (confirm(`Muat kembali data arsip tanggal ${target.waktu}? Data pengerjaan aktif Anda saat ini di tabel (jika ada) akan digantikan.`)) {
+        komponenList = JSON.parse(JSON.stringify(target.data));
+        localStorage.setItem('tei_komponen_list', JSON.stringify(komponenList));
+        tampilkanHasil();
+        alert("Data arsip riwayat berhasil dimuat ulang ke tabel utama!");
+      }
+    }
+  }
+
+  function hapusRiwayat(idRiwayat) {
+    if (confirm("Apakah Anda yakin ingin menghapus baris arsip riwayat ini saja?")) {
+      riwayatList = riwayatList.filter(r => r.id !== idRiwayat);
+      localStorage.setItem('tei_riwayat_list', JSON.stringify(riwayatList));
+      tampilkanTabelRiwayat();
+    }
+  }
+
+  function bersihkanSemuaRiwayat() {
+    if (confirm("PENTING: Anda akan menghapus SELURUH daftar arsip riwayat permanen. Tindakan ini tidak dapat dibatalkan. Lanjutkan?")) {
+      riwayatList = [];
+      localStorage.removeItem('tei_riwayat_list');
+      tampilkanTabelRiwayat();
+    }
   }
 </script>
-<hr style="border: 0; border-top: 1px solid #e2e8f0; margin-top: 30px; margin-bottom: 20px;">
-<div style="text-align: center; color: #94a3b8; font-size: 11px; font-weight: 500; font-family: sans-serif; padding-bottom: 20px;">
-    © Sistem Kalkulator EOQ - Magang Berdampak UNIPOL 2026
-</div>
+
 </body>
 </html>
