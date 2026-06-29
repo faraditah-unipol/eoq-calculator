@@ -33,8 +33,7 @@
     .header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
 
     .logo-group { display: flex; gap: 12px; align-items: center; }
-    
-    /* Perbaikan frame logo mengikuti gambar agar bulat sempurna tanpa background hitam mengganggu */
+
     .logo-group img {
       height: 75px; 
       width: 75px;
@@ -359,23 +358,19 @@
     /* CSS MEDIA PRINT UNTUK CETAK LEMBAR NEGARA RESMI */
     @media print {
       body { background-color: white; }
-      
-      /* Menyembunyikan seluruh elemen input, tombol, navbar, dan JUDUL FORM INPUT */
+
       .navbar, .form > label, .form > input, .form > select,
       .form > p, .form > button, .keterangan, .rupiah-preview,
       .action-group, .btn-hapus, .card-riwayat,
-      .form h2 { display: none !important; } /* <-- Menambahkan .form h2 agar teks input hilang */
-      
-      /* Memastikan penampang utama, hasil, ringkasan, dan grafik tetap tegak dan rapi */
+      .form h2 { display: none !important; }
+
       .header, #hasil, .ringkasan, .grafik-wrap { display: block !important; }
       .form { box-shadow: none; margin: 0; padding: 0; max-width: 100%; border: none; }
-      
-      /* Memberi batas jarak atas yang rapi untuk Lembar Usulan */
+
       #hasil {
         margin-top: 30px !important;
       }
 
-      /* Membuat Header Laporan Cetak Resmi */
       #hasil::before {
         content: "LEMBAR USULAN PENGADAAN BAHAN PRAKTIK HABIS PAKAI LAB TEI";
         display: block;
@@ -388,7 +383,7 @@
         padding-bottom: 8px;
       }
     }
-    
+
   </style>
 </head>
 <body>
@@ -446,7 +441,6 @@
 
       <label>Nama Komponen</label>
       <p class="keterangan">Pilih dari komponen habis pakai standar TEI atau pilih 'Lainnya' untuk mengetik manual.</p>
-      <!-- Integrasi Datalist untuk Dropdown Pintar Komponen TEI -->
       <input type="text" id="nama" list="komponen-tei" placeholder="Pilih atau ketik nama komponen...">
       <datalist id="komponen-tei">
         <option value="Timah Solder (Roll)">
@@ -485,15 +479,14 @@
 
       <div id="hasil"></div>
       <div id="ringkasan"></div>
-      
+
       <div id="grafik-wrap" style="display:none;" class="grafik-wrap">
         <h3><i class="fa fa-chart-bar"></i> Grafik Perbandingan EOQ</h3>
         <canvas id="grafikEOQ"></canvas>
       </div>
-      
+
       <div id="print-wrap" class="action-group" style="display:none;">
         <button class="btn-print" onclick="window.print()"><i class="fa fa-print"></i> Cetak Hasil Laporan</button>
-        <!-- Fitur Simpan Manual Masuk ke Riwayat Storage -->
         <button class="btn-simpan-riwayat" onclick="simpanKeRiwayat()"><i class="fa fa-bookmark"></i> Simpan ke Riwayat Arsip</button>
       </div>
     </div>
@@ -542,7 +535,6 @@
     </div>
   </div>
 
-  <!-- Watermark Fix sesuai Opsi Kesepakatan Akhir -->
   <div class="footer">© Sistem Optimasi Pengadaan Lab TEI — Magang Berdampak Unipol 2026</div>
 
 <script>
@@ -550,7 +542,6 @@
   let riwayatList = [];
   let grafikInstance = null;
 
-  // Fungsi saat window pertama kali dimuat (Load LocalStorage agar data tidak hilang)
   window.onload = function() {
     if (localStorage.getItem('tei_komponen_list')) {
       komponenList = JSON.parse(localStorage.getItem('tei_komponen_list'));
@@ -569,7 +560,6 @@
     btn.classList.add('active');
   }
 
-  // Real-time Text Pembantu Format Mata Uang Rupiah
   function liveRupiah(input, previewId) {
     const value = parseFloat(input.value);
     const previewSpan = document.getElementById(previewId);
@@ -592,17 +582,27 @@
       return;
     }
 
+    // PERBAIKAN: validasi nilai harus lebih besar dari 0
+    // Mencegah EOQ menjadi Infinity/NaN akibat pembagian dengan 0
+    if (D <= 0 || S <= 0 || P <= 0 || I <= 0) {
+      alert('Nilai Demand, Biaya Pesan, Harga Satuan, dan Biaya Simpan harus lebih besar dari 0.');
+      return;
+    }
+
     const H = P * I / 100;
     const EOQ = Math.sqrt((2 * D * S) / H);
     const freq = D / EOQ;
-    const interval = Math.round(12 / freq);
+
+    // PERBAIKAN: cegah interval membulat ke 0 saat freq > 12 (pesan lebih dari sekali per bulan)
+    const intervalRaw = 12 / freq;
+    const interval = freq > 12 ? null : Math.round(intervalRaw);
+
     const tp = (D / EOQ) * S;
     const ts = (EOQ / 2) * H;
     const tc = tp + ts;
 
     komponenList.push({ nama, D, S, P, I, H, EOQ, freq, interval, tp, ts, tc });
-    
-    // Simpan ke LocalStorage komponen aktif saat ini
+
     localStorage.setItem('tei_komponen_list', JSON.stringify(komponenList));
 
     tampilkanHasil();
@@ -617,9 +617,18 @@
 
   function resetForm() {
     ['nama','D','S','P','I'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('I').value = "20"; // reset default value
+    document.getElementById('I').value = "20";
     document.getElementById('previewS').innerText = "";
     document.getElementById('previewP').innerText = "";
+  }
+
+  // PERBAIKAN: fungsi pembantu untuk menampilkan teks interval pesan
+  // Menangani kasus freq > 12 (interval null) agar tidak tampil "Infinity" atau "0 bulan"
+  function teksInterval(k) {
+    if (k.interval === null) {
+      return "Lebih dari sekali per bulan";
+    }
+    return "Setiap " + k.interval + " bulan sekali";
   }
 
   function tampilkanHasil() {
@@ -639,7 +648,7 @@
         <td>${i+1}</td>
         <td>${k.nama}</td>
         <td>${Math.round(k.EOQ)}</td>
-        <td>Setiap ${k.interval} bulan sekali</td>
+        <td>${teksInterval(k)}</td>
         <td>Rp ${Math.round(k.tc).toLocaleString('id-ID')}</td>
         <td><button class="btn-hapus" onclick="hapusBaris(${i})"><i class="fa fa-trash"></i></button></td>
       </tr>`;
@@ -657,7 +666,7 @@
         <h3><i class="fa fa-list-check"></i> Ringkasan</h3>
         <ul>
           <li>Total biaya operasional seluruh komponen: <strong>Rp ${Math.round(totalBiaya).toLocaleString('id-ID')}/tahun</strong></li>
-          <li>Komponen paling sering dipesan: <strong>${seringDipesan.nama}</strong> (setiap ${seringDipesan.interval} bulan)</li>
+          <li>Komponen paling sering dipesan: <strong>${seringDipesan.nama}</strong> (${teksInterval(seringDipesan)})</li>
           <li>Komponen dengan biaya operasional terbesar: <strong>${termahal.nama}</strong> (Rp ${Math.round(termahal.tc).toLocaleString('id-ID')})</li>
         </ul>
       </div>`;
@@ -690,9 +699,8 @@
     });
   }
 
-  // Sekarang fungsinya murni HANYA mengosongkan kolom ketikan input saja
   function resetSemua() {
-    resetForm(); 
+    resetForm();
   }
 
   /* ================= SIMPAN & MUAT SISTEM RIWAYAT MANUAL ================= */
@@ -709,7 +717,6 @@
 
     const totalBiaya = komponenList.reduce((a, k) => a + k.tc, 0);
 
-    // Kloning array komponen aktif saat ini agar tidak putus relasi memorinya
     const bundelData = JSON.parse(JSON.stringify(komponenList));
 
     riwayatList.push({
@@ -727,14 +734,14 @@
 
   function tampilkanTabelRiwayat() {
     const tempatTabel = document.getElementById('tabel-riwayat-place');
-    
+
     if (riwayatList.length === 0) {
       tempatTabel.innerHTML = "<p class='keterangan' style='text-align:center; padding: 20px; border: 1px dashed #ccc;'>Belum ada riwayat pengadaan resmi yang disimpan.</p>";
       return;
     }
 
     let html = "<table><tr><th>No</th><th>Tanggal & Jam</th><th>Total Item</th><th>Estimasi Biaya</th><th>Aksi</th></tr>";
-    
+
     riwayatList.forEach((r, idx) => {
       html += `<tr>
         <td>${idx + 1}</td>
